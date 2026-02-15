@@ -5,7 +5,7 @@ export async function retry<T>(fn: () => Promise<T>, attempts = 3): Promise<T> {
       return await fn();
     } catch (err) {
       lastError = err;
-      await new Promise(r => setTimeout(r, 300)); // krátká pauza
+      await new Promise(r => setTimeout(r, 300));
     }
   }
   throw lastError;

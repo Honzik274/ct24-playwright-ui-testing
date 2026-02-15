@@ -9,7 +9,8 @@ test('@regression : Nejčtenější články (horní) - Domácí', async ({ page
   await home.goto();
   await section.openRubrika('Domácí');
 
-  const mostReadTop = section.mostReadTopRight();
+  // ⭐ DŮLEŽITÉ: mostReadTopRight() je async → musíme awaitovat
+  const mostReadTop = await section.mostReadTopRight();
 
   await mostReadTop.waitForVisible(20000);
 

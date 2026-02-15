@@ -4,7 +4,7 @@ import { MostReadComponent } from '../components/mostRead.component';
 
 export class SectionPage extends BasePage {
 
-  currentRubrikaUrl: string = ''; // ⭐ DOPLNĚNO – tohle opraví chybu TS2339
+  currentRubrikaUrl: string = '';
 
   constructor(page: Page) {
     super(page);
@@ -31,9 +31,9 @@ export class SectionPage extends BasePage {
       await link.click();
     }
 
-    // ⭐ Stabilizace načtení rubriky
+    // ⭐ Stabilizace načtení rubriky (bez networkidle)
     await this.page.waitForLoadState('domcontentloaded');
-    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForTimeout(500);
 
     // ⭐ Uložíme URL rubriky
     this.currentRubrikaUrl = this.page.url();
@@ -45,10 +45,14 @@ export class SectionPage extends BasePage {
     return new MostReadComponent(this.page, section, this.currentRubrikaUrl);
   }
 
-  mostReadTopRight(): MostReadComponent {
+  // ⭐ JEDINÁ ÚPRAVA → přidáno async
+  async mostReadTopRight(): Promise<MostReadComponent> {
     const heading = this.page.locator('h2, h3').filter({
       hasText: /nejčtenější z rubriky/i
     });
+
+    // ⭐ DŮLEŽITÉ: horní widget se načítá pozdě → explicitně počkáme
+    await heading.first().waitFor({ state: 'visible', timeout: 10000 });
 
     const wrapper = heading
       .locator('xpath=ancestor::*[contains(@class, "wc-ta")]')
