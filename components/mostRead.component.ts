@@ -58,24 +58,28 @@ export class MostReadComponent {
     for (let i = 0; i < max; i++) {
       const link = articles.nth(i);
 
-      // ⭐ Stabilní otevření článku s retry
+      // ⭐ Stabilní otevření článku bez waitForNavigation
       await retry(async () => {
         if (this.page.isClosed()) {
           throw new Error("Page closed during retry");
         }
 
-        await Promise.all([
-          this.page.waitForNavigation({ waitUntil: 'domcontentloaded' }),
-          stableClick(link)
-        ]);
+        await stableClick(link);
+
+        // ⭐ Stabilní čekání na URL článku
+        await this.page.waitForURL('**/clanek/**', { timeout: 15000 });
       });
 
       // ⭐ Stabilní návrat na rubriku
       await this.page.goto(this.returnUrl, { waitUntil: 'domcontentloaded' });
       await this.page.waitForTimeout(500);
 
-      // ⭐ Po návratu čekáme na sekci
-      await this.section.waitFor({ state: 'visible' });
+      // ⭐ Firefox lazy-load fix: scroll nahoru, aby se widget načetl
+      await this.page.evaluate(() => window.scrollTo(0, 0));
+      await this.page.waitForTimeout(300);
+
+      // ⭐ Teprve teď čekáme na sekci
+      await this.section.waitFor({ state: 'visible', timeout: 15000 });
     }
   }
 }
