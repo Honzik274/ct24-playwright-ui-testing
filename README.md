@@ -80,3 +80,8 @@ MostReadComponent – ověření článků, přepínání, otevírání článk�
 Testy pokrývají celé zadání
 Stabilní v Chromiu i Firefoxu
 POM připravený pro další rozšíření
+
+
+## 📄 Další dokumentace
+
+Detailní analýza testování je uvedena v souboru **ANALYSIS.md**.
